@@ -10,13 +10,14 @@ use Phalcon\Di\FactoryDefault;
 use Phalcon\Mvc\View;
 use Phalcon\Mvc\Application;
 use Phalcon\Mvc\Url;
+use Phalcon\Session\Adapter\Files as Session;
 use Phalcon\Mvc\View\Engine\Volt;
 use Phalcon\Events\Manager as EventsManager;
 use Phalcon\Mvc\Dispatcher;
 use Library\Log\Log;
 use Events\DispatchEventPlugin;
 
-// 定义常量
+/*********************************************** 定义常量 ***********************************************/
 define('DEBUG', TRUE);
 define('DS', DIRECTORY_SEPARATOR);
 define('APP_PATH', realpath('..') . '/');                                                           // 项目目录路径
@@ -28,7 +29,7 @@ define('APP_EXCEPTION', 'application.exception');                               
 define('URL_PATH', dirname('http://' . $_SERVER['SERVER_NAME']) . '/');                             // 获取当前URL
 require_once(APP_CONFIG_PATH.'const.php');   
 
-// 加载配置文件和公共函数文件
+/*********************************************** 加载配置文件和公共函数文件 ***********************************************/
 $configFile = APP_CONFIG_PATH . 'config.php';
 $settings = require_once($configFile);   
 $config = new Config($settings);
@@ -57,6 +58,7 @@ if (DEBUG || $config->environment == 'local') {
    ini_set('display_errors', '0');
 }   
 
+/*********************************************** 异常处理 ***********************************************/
 function catchException($exception)
 {
     $_GET['_url']=array_key_exists('_url', $_GET) ? $_GET['_url'] : '/' ;
@@ -108,7 +110,7 @@ set_exception_handler('catchException');
 set_error_handler('catchError');
 
 
-// Register an autoloader
+/*********************************************** 注册自动加载 ***********************************************/
 $loader = new Loader();
 $loader->registerDirs(array(
     APP_PATH . 'app/controllers/',  // 控制器目录
@@ -131,6 +133,7 @@ $loader->registerNamespaces([
 // 创建容器
 $di = new FactoryDefault();
 
+/*********************************************** 注入服务 ***********************************************/
 // 注入配置文件类
 $di->set('config', $config);
 
@@ -183,6 +186,13 @@ $di->set('service', function () {
     return new Services\BaseService();
 });
 
+// 注入session
+$di->set('session', function () {
+    $session = new Session();
+    $session->start();
+    return $session;
+});
+
 // 注入缓存服务
 $di->set('redis', function () use ($config) {
     return  new Library\Redis\Redis();
@@ -218,6 +228,6 @@ $di->set('dispatcher', function () {
 });
 
 
-// 启动应用
+/*********************************************** 启动应用 ***********************************************/
 $application = new Application($di);
 echo $application->handle()->getContent();
