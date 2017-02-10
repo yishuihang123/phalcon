@@ -1,0 +1,23 @@
+{
+  "name": "phalcom_demo",
+  "description": "NONE",
+  "keywords": [
+    "phalcon"
+  ],
+  "license": "Apache",
+  "homepage": "https://github.com/yishuihang123/phalcom_demo",
+  "require": {
+    "php": ">=5.4.30",
+    "predis/predis": "^1.1"
+  },
+  "autoload": {
+    "psr-4": {
+    }
+  },
+  "authors": [
+    {
+      "name": "yishuihang",
+      "email": "437087977@qq.com"
+    }
+  ]
+}
